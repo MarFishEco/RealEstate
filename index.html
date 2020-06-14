@@ -508,10 +508,11 @@ cartodb.createLayer(map, 'https://stanford.carto.com/u/gverutes/api/v2/viz/2dee2
 L.control.zoom({ position: 'topleft' }).addTo(map);
 	
 // mini map
-var MapboxStreets = 'http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png';
+var CartoLight = 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'	
+//var MapboxStreets = 'http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png';
 //var MapboxStreets = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
-var mb = new L.TileLayer(MapboxStreets	, {minZoom: 4, maxZoom: 18});
-var miniMap = new L.Control.MiniMap(mb, { toggleDisplay: true, height: '100', width: '100', position: 'topleft' }).addTo(map); 
+var mb = new L.TileLayer(CartoLight, {minZoom: 4, maxZoom: 18});
+var miniMap = new L.Control.MiniMap(mb, { toggleDisplay: true, height: '160', width: '125', position: 'topleft' }).addTo(map); 
 
 
 
