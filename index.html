@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+<title>Real Estate Explorer</title>
+<head>
+  <meta charset="utf-8" />
+  <html lang="en">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+  <!--jQuery-->
+  <script src="js/jquery.js" type="text/javascript"></script>
+  <script src="js/main.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+  <!--Stylesheet-->
+  <link rel="stylesheet" href="inc/style.css" />
+  
+  <!--Custom JS-->
+  <script type="text/javascript" src="inc/initiators.js"></script>
+  
+  <!--Mapbox API-->
+  <meta name='viewport' content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <link href="https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.css" rel="stylesheet" />
+  
+  <!--Fonts-->
+  <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700" rel="stylesheet" type="text/css"><!--Open Sans-->
+ 
+  
+  <!--CartoDB SidePanel-->
+  <link rel="stylesheet" href="css/light-theme.css">
+  <link rel="stylesheet" href="css/makeitresponsive.css">
+  <link rel="stylesheet" href="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+  
+
+  <script src="https://cartodb-libs.global.ssl.fastly.net/cartodb.js/v3/3.15/cartodb.uncompressed.js">
+  </script>
+  <script src="https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.standalone.js"></script>
+  
+   <!-- Leaflet Plugins -->
+  <link rel="stylesheet" href="src/Control.MiniMap.css" />
+  <script src="src/Control.MiniMap.js" type="text/javascript"></script>
+   
+  
+  
+  <script>
+    $(function() {
+      $( "#dialog" ).dialog({
+	modal: true
+      });
+    });
+  </script>
+ 
+ 
+  <!--[if lte IE 8]>
+    <link href='http://api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.ie.css' rel='stylesheet' >
+  <![endif]-->
+
+  <!-- Leaflet Plugins 
+  <link rel="stylesheet" href="src/Control.MiniMap.css" />
+  <script src="src/Control.MiniMap.js" type="text/javascript"></script>-->
+  
+
+	<style>
+	body{
+		font: 62.5% "Trebuchet MS", sans-serif;
+	}
+	.demoHeaders {
+		margin-top: 1em;
+	}
+	#dialog-link {
+		padding: .4em 1em .4em 20px;
+		text-decoration: none;
+		position: relative;
+	}
+	#dialog-link span.ui-icon {
+		margin: 0 5px 0 0;
+		position: absolute;
+		left: .2em;
+		top: 50%;
+		margin-top: -8px;
+	}
+	#icons {
+		margin: 0;
+		padding: 0;
+	}
+	#icons li {
+		margin: 2px;
+		position: relative;
+		padding: 4px 0;
+		cursor: pointer;
+		float: left;
+		list-style: none;
+	}
+	#icons span.ui-icon {
+		float: left;
+		margin: 0 4px;
+	}
+	.fakewindowcontain .ui-widget-overlay {
+		position: absolute;
+	}
+	select 
+	{
+		width: 200px;
+	}
+	
+	#format
+	{
+		text-align: center;
+	}
+	
+	#myZip {
+	  width:125px;   
+	}	
+	
+	#myNeighbor {
+	  width:125px;   
+	}		
+	
+	#NC {
+	  width:125px;   
+	}		
+
+	#SC {
+	  width:125px;   
+	}	
+	
+	#VA {
+	  width:125px;   
+	}	
+	
+	#page{
+		display:none;
+	}
+
+	#loading {
+	  display: block;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  z-index: 100;
+	  width: 100vw;
+	  height: 100vh;
+	  background-color: rgba(192, 192, 192, 1);
+	  background-image: url("https://i.stack.imgur.com/MnyxU.gif");
+	  background-repeat: no-repeat;
+	  background-position: center;
+	}	
+	
+* {
+  box-sizing: border-box;
+}
+
+.autocomplete {
+  /*the container must be positioned relative:*/
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 75%;
+  left: 50%;
+  right: 0;
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #d3d3d3; 
+}
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}  
+  
+
+ <!-- TABLES -->
+#table01 { width:100%; border:0px solid #D9D5BE; margin:0px; background:white; border-collapse:collapse;}
+#table01 td { border:0px solid #D9D5BE; vertical-align: top; width: 300px; padding: 12px;}
+
+#table02 { width:100%; border:0px solid #D9D5BE; margin:0px; background:white; border-collapse:collapse;}
+#table02 td { border:0px solid #D9D5BE; vertical-align: top; width: 300px; padding: 10px;}
+
+#table02c { width 40%; border:0px solid #D9D5BE; margin:0px; background:white; border-collapse:collapse; margin-left:2.5%; margin-right:0%;}
+#table02c tr { border:1px solid #000; vertical-align: middle; width: 100px; padding: 1px; font-size:100%;}
+#table02c td { border:1px solid #D9D5BE; vertical-align: middle; width: 100px; padding: 1px; font-size:80%;}
+.cellClass { font-size:60%;}
+.cellClass2 { font-size:80%;}
+#table02c tr:hover {background-color: rgba(225,225,225, 1);}
+
+	
+</style>   
+
+
+
+<!--
+  <div id="dialog" title="SOM">
+    <div class="note">
+    <p><h2>Self-Organizing Map (SOM)</h2></p>
+	Ecosystem Services</p>
+	<p></p>blah, blah, blah... ADD LISA SI MAP
+    </div>
+  </div><!--#dialog-->
+
+
+    <script>
+        function myFunction()
+        {
+            document.getElementById("page").style.display = "block";
+            document.getElementById("loading").style.diplay = "none";
+        }
+    </script>
+</head>
+
+<body>
+
+
+
+<div class="page"> 
+	
+  
+<div class="map" id="map"></div>
+
+<div class="sidepanel">
+
+
+<!-- JQuery Tabs -->
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1"><b>ZOOM</b></a></li>	
+		<li><a href="#tabs-2"><b>PRESENT</b></a></li>	
+		<li><a href="#tabs-3"><b>PAST</b></a></li>
+	</ul>
+
+	<div id="tabs-1">
+	<fieldset>
+	 <legend><b>CITY</b></legend>
+	<div class="controlgroup">
+      <select id="NC">
+        <option value="0">Select NC city...</option>
+        <option value="1">CHARLOTTE</option>		
+        <option value="2">DURHAM</option>
+        <option value="3">GREENSBORO</option>		
+        <option value="4">RALEIGH</option>
+        <option value="5">WINSTON-SALEM</option>
+      </select>
+	</div>	
+	<div class="controlgroup">
+      <select id="SC">
+        <option value="0">Select SC city...</option>
+        <option value="1">GREENVILLE</option>		
+        <option value="2">SPARTANBURG</option>
+      </select>
+	</div>	
+	<div class="controlgroup">
+      <select id="VA">
+        <option value="0">Select VA city...</option>
+        <option value="1">NORFOLK</option>
+        <option value="2">VIRGINIA BEACH</option>				
+      </select>
+	</div>		
+	</fieldset>	
+	<br>
+	<fieldset>
+	<legend><b>NEIGHBORHOOD</b></legend>
+	<input id='myNeighbor' class='neighbor' type='text' name='myNeighbor'><!--<button onclick="zoomNeighbor();">Enter</button>-->
+    </fieldset>
+	<br>
+	<fieldset>
+	<legend><b>ZIP CODE</b></legend>
+	<input id='myZip' class='zip' type='text' name='myZip''>	
+	<!--<input id='myZip' class='zip' type='text' name='myZip' onClick='(this.value="")'>-->
+    </fieldset>
+	</div>
+
+	
+	<div id="tabs-2">
+	<fieldset>
+	<legend><b>REAL-TIME DATA</b></legend>
+    <input type="checkbox" name="real[]" id="ck1" checked>
+	    <label for="ck1">Fuel stations</label><br>
+    <input type="checkbox" name="real[]" id="ck2" checked>	
+	    <label for="ck2">Golf courses</label><br>	
+    <input type="checkbox" name="real[]" id="ck3" checked>
+	    <label for="ck4">Private schools</label><br>
+    <input type="checkbox" name="real[]" id="ck4" checked>
+	    <label for="ck4">Supermarkets</label><br>
+    <input type="checkbox" name="real[]" id="ck5">
+	    <label for="ck5">Crimes</label>
+
+	<br>
+	<!--<input type="button" value="LIST" onclick="showBoxes();"> <input type="button" value="CLEAR" onclick="clearBoxes();">-->
+	</fieldset>
+	<br>
+	<div id="Summary"></div>
+	</div>
+		
+	
+	<div id="tabs-3">
+	<fieldset>
+	<legend><b>CENSUS DATA</b></legend>
+	<input type="radio" name="radio-4" id="radio-4a" checked>
+		<label for="radio-4a">Income</label><br>
+    <input type="radio" name="radio-4" id="radio-4b" onclick="return false;" disabled="disabled"/>
+		<label for="radio-4b">Race</label><br>
+    <input type="radio" name="radio-4" id="radio-4c" onclick="return false;" disabled="disabled"/>
+		<label for="radio-4c">Age</label><br>
+    <input type="radio" name="radio-4" id="radio-4d" onclick="return false;" disabled="disabled"/>
+		<label for="radio-4d">Education</label><br>	
+	<input type="radio" name="radio-4" id="radio-4e" onclick="return false;" disabled="disabled"/>
+		<label for="radio-4e">Tenure</label><br>	
+	<br>
+
+	<div id="slider">
+	<br><center>Layer Opacity: &nbsp;&nbsp;<input type="text" id="minval" size="2" style="border:0; color:#000; font-weight:bold;">%</center>
+	</div>
+	<br><br>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+function onReady(callback) {
+  var intervalId = window.setInterval(function() {
+    if (document.getElementsByTagName('body')[0] !== undefined) {
+      window.clearInterval(intervalId);
+      callback.call(this);
+    }
+  }, 2000);
+}
+
+function setVisible(selector, visible) {
+	document.querySelector(selector).style.display = visible ? 'block' : 'none';
+}
+
+onReady(function() {
+	setVisible('.page', true);
+	setVisible('#loading', false);
+});
+
+
+
+
+$( document ).ready(function() {
+
+	$("#accordion").accordion({ header: "h4", collapsible: true, active: 0, heightStyle: 'panel' });
+	$( "#tabs" ).tabs();
+    $( "#check" ).button();
+    $( "#format" ).buttonset();
+	$( "#tooltip" ).tooltip();
+	//$("#accordion").accordion({ active: 4});
+	
+	setTimeout(function() {  
+	$( "#NC").val(1);
+	map.setView([35.21, -80.8], 12);   
+
+	
+  }, 4000);  
+	
+
+	setTimeout(function() {  
+	$( "#tabs" ).tabs({ active: 1});
+	
+  }, 5500);  	
+
+	
+	//showSummary();
+	
+	
+  $( "#slider" ).slider({
+  	change: function(event, ui) {showHistoric(ui.value);} ,
+	   orientation: "horizontal",
+	   value: 50,
+	   step:25,
+	   min: 25,
+       max: 75,
+	   slide: function( event, ui ){
+		$( "#minval" ).val( ui.value );
+	   }	
+	});
+	$( "#minval" ).val( $( "#slider" ).slider( "value" ) );	
+	
+	
+});
+	
+///////////////////////////////////////////////////////////////////////////////////
+
+
+$("#myZip").keyup(function(event) {
+    if (event.keyCode === 13) {
+        zoomZip();
+    }
+});
+
+$("#myNeighbor").keyup(function(event) {
+    if (event.keyCode === 13) {
+        zoomNeighbor();
+    }
+});
+
+
+
+var sql = new cartodb.SQL({ user: 'gverutes' });
+
+///////////////////////////////////////////////////////////////////////////////////	
+	
+	
+
+// base maps
+var ESRIImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, and UPR-EGP'
+});
+var OSM = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://www.openstreetmap.org">OpenStreetMaps</a>'});
+var MapboxStreets = L.tileLayer('http://a.tiles.mapbox.com/v3/geointerest.afb8c76d/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://www.mapbox.com">Mapbox</a>'});
+var CartoDark = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+		  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+		});
+
+// map settings
+L.mapbox.accessToken = 'pk.eyJ1IjoiZ2VvaW50ZXJlc3QiLCJhIjoiQ2czbnlDMCJ9.pQ-_LxzHCL6WqMm5rJrEWw';
+
+	
+// set base map and controls
+var map = new L.Map('map', {
+  zoomControl: false,
+  layer_selector: true,
+  layers: [MapboxStreets],
+  center: [35.875, -78],
+  zoom: 7,
+  minZoom: 7,
+  maxZoom: 19
+});
+
+
+// scroll wheel
+//map.scrollWheelZoom.disable();
+
+map.attributionControl.setPrefix('Map viewer: <a href="mailto:gverutes@audubon.org" target="_top">G. Verutes</a>');
+	
+// add basemap and overlays
+var baseMaps = {
+	"<b>neighborhood</b>": MapboxStreets,
+	"<b>street</b>": OSM,
+	"<b>satellite</b>": ESRIImagery,
+	//"<b>dark</b>": CartoDark,
+};
+
+
+// add CartoDB vector	
+//var layerUrl = 'https://gverutes.cartodb.com/api/v2/viz/416c8824-4f2d-4c85-b856-39b9ef48c1a2/viz.json';
+var UrbanAreas = 'https://gverutes.cartodb.com/api/v2/viz/872a869b-813b-48df-9cb4-ca598dce854d/viz.json';
+neighborBndry = 'https://gverutes.cartodb.com/api/v2/viz/b1d4392d-4292-401f-9730-edb9dd407584/viz.json';
+
+function openMarkerPopup(id){
+	geojson.eachLayer(function(feature){
+		if(feature.feature.properties.id==id){
+			feature.openPopup();
+		}
+	});
+}    
+map.closePopup();
+
+cartodb.createLayer(map, 'https://stanford.carto.com/u/gverutes/api/v2/viz/81e6f0d1-4fc5-4b52-b515-4a4dd9a69426/viz.json')
+	.addTo(map)
+	.on('done', function(layer) {
+	layer.setZIndex(4);
+	});	
+
+
+
+
+// add cartoDB layer and set z-index so it shows up on top
+cartodb.createLayer(map, UrbanAreas)
+	.on('done', function(layer) {
+		layer.setZIndex(100);
+		var overlayMaps = {
+		"urban areas": layer.addTo(map),
+		};
+	L.control.layers(baseMaps, overlayMaps, {position: 'topleft', collapsed: false}).addTo(map);
+});
+
+
+cartodb.createLayer(map, 'https://stanford.carto.com/u/gverutes/api/v2/viz/2dee20ab-5cd8-4c89-96bb-39ac63431fc6/viz.json')
+	.addTo(map)
+	.on('done', function(layer) {
+	layer.setZIndex(5);
+	});	
+
+// zoom control
+L.control.zoom({ position: 'topleft' }).addTo(map);
+	
+// mini map
+var MapboxStreets = 'http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png';
+//var MapboxStreets = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
+var mb = new L.TileLayer(MapboxStreets	, {minZoom: 4, maxZoom: 18});
+var miniMap = new L.Control.MiniMap(mb, { toggleDisplay: true, height: '100', width: '100', position: 'topleft' }).addTo(map); 
+
+
+
+// scale
+L.control.scale({ position: 'bottomleft' }).addTo(map);
+
+
+// when map moves, update listing
+map.on("moveend", function(e) {
+  showSummary();
+});	
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+          b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        e.preventDefault();
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  /*execute a function when someone clicks in the document:*/
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+      });
+}
+
+/*An array containing all the country names in the world:*/
+
+var neighborList = ['Newell','Hickory Grove','Sterling','Mountain Island','Barclay Downs','Belmont','Myers Park','Ballantyne East','Becton Park','Country Club Heights','Druid Hills South','Elizabeth','Enderly Park','First Ward','Arbor Glen','Ashley Park','Dilworth','Chantilly','Oakdale South','Oaklawn','Olde Providence South','Plaza Hills','Prosperity Church Road','Sardis Forest','Sherwood Forest','Starmount','Villa Heights','Washington Heights','Wessex Square','Whiteoak','Madison Park','Stonehaven','Cherry','Coulwood East','East Forest','Eastover','Greenville','Idlewild Farms','Idlewild South','Lansdowne','Marlwood','Mountainbrook','Newell South','Fourth Ward','Back Creek Church Road','Beverly Woods','Biddleville','Carmel','Cotswold','Farm Pond','Governor&#8217;s Square','Grier Heights','Griers Fork','Hembstead','Toddville Road','Highland Creek','Lakewood','Lincoln Heights','Nevin Community','North Sharon Amity','Park Crossing','Quail Hollow','Sardis Woods','Shannon Park','Sharon Woods','Providence Crossing','Providence Park','Provincetowne','Reid Park','Third Ward','Ballantyne West','Collingwood','Colonial Village','College Downs','Montibello','Sunset Road','Silverwood','Seversville','Todd Park','University Park','Druid Hills North','Echo Hills','Foxcroft','Freedom Park','Henderson Circle','Smallwood','Tryon Hills','University City North','Wildwood','Wilmore','Hidden Valley','University City South','Lockwood','Marshbrooke','Commonwealth','Hickory Ridge','Piper Glen Estates','Providence Plantation','Sedgefield','Starmount Forest','Yorkmount','Montclaire South','North Charlotte','Oak Forest','Oakhurst','Olde Providence North','Optimist Park','Oxford Hunt','Pawtuckett','Pinecrest','Plaza Midwood','Rain Tree','Revolution Park','Seven Eagles','Southside Park','Wesley Heights','Westchester','Westerly Hills','Westover Hills','Windsor Park','Coulwood West','Double Oaks','Olde Whitehall','Yorkshire','Eagle Lake','Providence Estates East','Oakdale North','Steele Creek','Harwood Lane','Harwood Lane','Mallard Creek - Withrow Downs'];
+var zipList = ['28658','28025','28244','28203','29733','29724','28078','28110','28006','28088','28092','28108','28280','28282','27028','28625','27014','29712','28012','28023','28660','28227','28636','28634','28101','27054','28270','28034','28262','28226','28217','28120','28613','28079','28212','28077','28677','27013','28027','28031','28032','28678','28673','28036','28037','28056','28075','28081','28083','28097','28105','28115','28117','28124','28125','28129','28134','28163','28147','28208','28166','29704','29708','28174','28204','28205','29715','28206','28207','29732','28210','28211','28213','28214','29730','28215','28269','28273','28277','28278','28098','28610','28609','28650','29707','28054','28104','28107','28209','28173','28216','28080','28112','28202','28682','28103','28164'];
+
+/*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+autocomplete(document.getElementById("myNeighbor"), neighborList);
+autocomplete(document.getElementById("myZip"), zipList);
+
+//////////////////////////////////////////
+
+
+
+
+
+var sql = cartodb.SQL({ user: 'gverutes' });
+
+
+
+$("#NC").change(function(event){
+	
+	$('#SC').val(0);
+	$('#VA').val(0);
+	$('#myNeighbor').val('');
+	$('#myZip').val('');	
+
+	if ($( "#NC option:selected" ).text() == 'CHARLOTTE'){
+	map.setView([35.217575, -80.8], 12);
+	}
+	else if ($( "#NC option:selected" ).text() == 'DURHAM'){
+	map.setView([35.999459, -78.900709], 12);
+	}
+	else if ($( "#NC option:selected" ).text() == 'GREENSBORO'){
+	map.setView([36.088438, -79.827220], 12);
+	}
+	else if ($( "#NC option:selected" ).text() == 'RALEIGH'){
+	map.setView([35.8, -78.652631], 12);
+	}
+	else if ($( "#NC option:selected" ).text() == 'WINSTON-SALEM'){
+	map.setView([36.101095, -80.256511], 12);
+	}  	
+	else{
+	map.setView([35.686602, -79.778315], 9);	
+	}
+});
+
+$("#SC").change(function(event){
+
+	$('#NC').val(0);
+	$('#VA').val(0);
+	$('#myNeighbor').val('');
+	$('#myZip').val('');
+
+	if ($( "#SC option:selected" ).text() == 'GREENVILLE'){
+	map.setView([34.842436, -82.378274], 12);
+	}
+	else if ($( "#SC option:selected" ).text() == 'SPARTANBURG'){
+	map.setView([34.945604, -81.931002], 12);
+	}
+	else{
+	map.setView([34.355660, -81.727435], 8);	
+	}
+});
+
+$("#VA").change(function(event){
+
+	$('#SC').val(0);
+	$('#NC').val(0);
+	$('#myNeighbor').val('');
+	$('#myZip').val('');
+
+
+	if ($( "#VA option:selected" ).text() == 'NORFOLK'){
+	map.setView([36.864539, -76.283769], 12);
+	}
+	else if ($( "#VA option:selected" ).text() == 'VIRGINIA BEACH'){
+	map.setView([36.801179, -76.059690], 12);
+	}
+	else{
+	map.setView([37.490389, -76.539648], 9);	
+	}
+});
+
+
+
+var endNeighbor = 0;  
+var sublayersNeighbor = [];
+
+function zoomNeighbor(){
+	
+	$('#NC').val(0);
+	$('#SC').val(0);
+	$('#VA').val(0);
+	$('#myZip').val('');
+
+	var neighborhood = document.getElementsByName('myNeighbor')[0].value; 	
+	
+	var MapQuery = "SELECT * FROM charlotte_mergepts WHERE name = '"+neighborhood+"'";
+	sql.getBounds(MapQuery).done(function(bounds) {
+	map.fitBounds(bounds);
+	map.setZoom(14);
+	});	
+
+	
+	var MapQueryNeighbor = "SELECT * FROM charlotte_neighborhoods WHERE name = '"+neighborhood+"'";
+
+
+	sql.execute(MapQueryNeighbor).done(function(data){
+			
+	// remove previous
+	if (endNeighbor > 0){sublayersNeighbor[endNeighbor-1].remove();}
+	endNeighbor = endNeighbor + 1;
+	
+	var CartoCSSNeighbor = "#charlotte_neighborhoods[zoom > 11]{polygon-opacity:0.1;polygon-fill:#3182bd;line-opacity:0.8;line-color:#000;line-width:2.25;[zoom < 9]{line-width:2}}";
+	
+	//var CartoCSSNeighbor = "#charlotte_neighborhoods[zoom > 11]{polygon-opacity:0.15;polygon-fill:#3182bd;line-opacity:0.8;line-color:#000;line-width:2.25;#charlotte_neighborhoods::labels[zoom>7]{text-name: [name];text-face-name: 'DejaVu Sans Book';text-size: 13;text-spacing: 10;text-dy: 25;text-fill: #000;text-halo-fill: rgba(255,255,255,0.75);text-halo-radius: 3;text-allow-overlap: true;text-label-position-tolerance:25;text-placement: point;text-placement-type: simple;}[zoom < 9]{line-width:2}}";
+	
+	  cartodb.createLayer(map, neighborBndry)
+	  .addTo(map)
+	  .on('done', function(layer) {
+		// change the query for the first layer
+		var subLayerOptions = {
+		  sql: MapQueryNeighbor,
+		  cartocss: CartoCSSNeighbor,
+		}
+		var sublayer = layer.getSubLayer(0);
+		layer.setZIndex(6);	
+		sublayer.set(subLayerOptions);
+		sublayersNeighbor.push(sublayer);
+	  }).on('error', function() {
+		// log the error
+	  });
+	})
+}
+		
+	
+
+function zoomZip(){
+	
+	$('#NC').val(0);
+	$('#SC').val(0);
+	$('#VA').val(0);
+	$('#myNeighbor').val('');
+
+	var zipcode = document.getElementsByName('myZip')[0].value; 	
+	
+	var MapQuery = "SELECT * FROM us_zipcodes WHERE zip_code = "+zipcode;
+	sql.getBounds(MapQuery).done(function(bounds) {
+	/*bounds[0][0] = bounds[0][0] - 0.025;
+	bounds[1][1] = bounds[1][1] + 0.025;
+	bounds[0][1] = bounds[0][1] - 0.025;
+	bounds[1][0] = bounds[1][0] + 0.025;*/
+	map.fitBounds(bounds);
+	map.setZoom(13);
+	/*
+	var rect = L.rectangle(bounds, {color: 'blue', weight: 1}).on('click', function (e) {
+    // There event is event object
+    // there e.type === 'click'
+    // there e.lanlng === L.LatLng on map
+    // there e.target.getLatLngs() - your rectangle coordinates
+    // but e.target !== rect
+    console.info(e);
+	}).addTo(map);	
+	*/
+	
+	});	
+
+}
+
+var count = 0;
+
+
+// Leaflet popup
+function zoomFeature(fid, name){	
+
+var MapQuery1 = "SELECT * FROM charlotte_mergepts WHERE cartodb_id = "+fid;
+
+	sql.getBounds(MapQuery1).done(function(bounds) {
+	//map.fitBounds(bounds);
+	map.setView([((bounds[0][0]+bounds[1][0])/2),((bounds[0][1]+bounds[1][1])/2)]);
+	
+	var popup = L.popup()
+		.setLatLng([((bounds[0][0]+bounds[1][0])/2),((bounds[0][1]+bounds[1][1])/2)])
+		.setContent(name.toUpperCase())
+		.openOn(map);
+		
+	});
+	
+}
+
+
+
+function showSummary(){
+
+	/*
+	var chk = document.getElementsByName('real[]')
+    var len = chk.length
+	
+	// remove checks
+    for(i=0;i<len;i++){
+		if(chk[i].checked){
+			$("#ck"+(i+1)).click();
+        }
+    }
+	*/
+	
+	var HTML = '';
+	
+	bounds = map.getBounds();
+	west = bounds.getWest();
+	westStr = west.toString();
+	north = bounds.getNorth();
+	northStr = north.toString();
+	east = bounds.getEast();
+	eastStr = east.toString();
+	south = bounds.getSouth();
+	southStr = south.toString();
+
+	
+	sql.execute("SELECT * FROM charlotte_mergepts WHERE (type = 'Fuel' OR type = 'Supermarket' OR type = 'Private School' OR type = 'Golf') AND (the_geom && ST_SetSRID(ST_MakeBox2D(ST_Point("+westStr+", "+northStr+"), ST_Point("+eastStr+", "+southStr+")), 4326)) ORDER BY type, name ASC")
+	  .done(function(data) {
+
+		// read table to variable "HTML"
+		count = data.total_rows;
+	
+		if (count > 75){
+			HTML = "<fieldset><legend><b>HARBINGERS OF CHANGE</b></legend><i>Too many features to list. Zoom in.</i></fieldset>"		
+		}
+		else if (count == 0){
+			HTML = "<fieldset><legend><b>HARBINGERS OF CHANGE</b></legend><i>No features in the map window.</i></fieldset>"
+		}
+		else{
+			HTML = "<fieldset><legend><b>HARBINGERS OF CHANGE</b></legend><table id='table02c'><tr id='cellClass'><td align='center'><u><b>MAP IT</b></u>&nbsp;</td><td align='center'><u><b>TYPE</b></u></td><td align='center'><u><b>NAME</b></u></td></tr>"
+			for (var i = 0; i < data.total_rows; i++) {HTML = HTML + "<tr><td align='center' id='cellClass'><a href='#' onclick='zoomFeature("+data.rows[i].cartodb_id+",\""+data.rows[i].name+"\");'>&#9668;</a></td><td align='center'>"+data.rows[i].type+"</td><td align='center'>"+data.rows[i].name.toUpperCase().substr(0,30)+"</td></tr>"}
+			HTML = HTML + "</table></fieldset><br>"
+		}
+		
+		// write results to right side panel
+		document.getElementById("Summary").innerHTML = HTML;
+	
+	  })	
+	
+}
+
+
+
+
+
+    </script>
+	
+	<div id="loading"></div> 
+  </body>
+</html>
